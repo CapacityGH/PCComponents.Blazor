@@ -1,7 +1,51 @@
 ﻿@page "/"
+@inject PcComponentsClient Client
 
-<PageTitle>Home</PageTitle>
+<PageTitle>My PC Components DB</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container py-3">
+    <h1 class="text-center text-primary mb-4">My PC Components</h1>
+    @if (components is null)
+    {
+        <p class="text-center text-muted">Loading...</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 g-md-4">
+            @foreach (var component in components)
+            {
+                <div class="col">
+                    <div class="card border-info shadow-sm h-100 rounded-3 card-hover d-flex flex-column">
+                        <div class="card-header bg-light border-info d-flex align-items-center justify-content-between">
+                            <div class="me-2">
+                                <h5 class="card-title mb-0 text-info">@component.Name</h5>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(component.Category?.Name))
+                            {
+                                <span class="badge bg-info text-dark">@component.Category?.Name</span>
+                            }
+                        </div>
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <p class="card-text fw-semibold mb-2">
+                                <span class="text-success">💲</span> @component.Price.ToString("C")
+                            </p>
+                            <p class="card-text text-muted mb-0">
+                                📅 Released:
+                                @(component.ReleaseDate == default ? "N/A" : component.ReleaseDate.ToString("yyyy-MM-dd"))
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
 
-Welcome to your new app.
+@code {
+    private PcComponent[]? components;
+
+    protected override async Task OnInitializedAsync()
+    {
+        components = await Client.GetComponentsAsync();
+    }
+}

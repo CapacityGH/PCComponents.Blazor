@@ -1,3 +1,4 @@
+using PcComponents.Blazor.Clients;
 using PcComponents.Blazor.Components;
 
 namespace PcComponents.Blazor
@@ -11,17 +12,21 @@ namespace PcComponents.Blazor
             // Add services to the container.
             builder.Services.AddRazorComponents();
 
+            var pcComponentApiUrl = 
+                builder.Configuration["componentApiUrl"] ?? throw new Exception("PC Component API URL is not set");
+
+            builder.Services.AddHttpClient<PcComponentsClient>(client => client.BaseAddress = new Uri(pcComponentApiUrl));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseExceptionHandler("/Error"); 
                 app.UseHsts();
             }
 
-            app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+            app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);  
             app.UseHttpsRedirection();
 
             app.UseAntiforgery();
